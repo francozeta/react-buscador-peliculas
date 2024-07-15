@@ -1,29 +1,32 @@
 import './App.css'
 
-import responseMovies from '../mocks/with-results.json'
+import { useRef } from 'react'
 
-import { Movies } from './components/Movies'
-
-export function useMovies () {
-  const movies = responseMovies.Search
-  const mappedMovies = movies.map(movie => ({
-    id: movie.imdbID,
-    title: movie.Title,
-    year: movie.Year,
-    poster: movie.Poster
-  }))
-
-  return { movies: mappedMovies }
-}
+import { Movies, useMovies } from './components/Movies'
 
 function App () {
   const { movies } = useMovies()
+  const inputRef = useRef()
+
+  const handleSubmit = (event) => {
+    // the method prevents the form from submitting and clears the input field
+    event.preventDefault()
+    const inputEl = inputRef.current
+    const value = inputEl.value
+    console.log(value)
+    /** Vanilla JS
+    * const { query } = Object.fromEntries(
+    *  new window.FormData(event.target)
+    * )
+    * console.log(query)
+    */
+  }
   return (
     <>
       <header>
         <h1>Buscador de Peliculas</h1>
-        <form className='form'>
-          <input type='text' placeholder='Avengers, Star Wars, Matrix...' />
+        <form className='form' onSubmit={handleSubmit}>
+          <input name='query' type='text' placeholder='Avengers, Star Wars, Matrix...' />
           <button type='submit'>
             Buscar
           </button>
