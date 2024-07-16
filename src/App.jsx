@@ -1,18 +1,24 @@
 import './App.css'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useMovies } from './hooks/useMovies'
 
-import { Movies, useMovies } from './components/Movies'
+import { Movies } from './components/Movies'
 function useSearch () {
   const [search, updateSearch] = useState('')
   const [error, setError] = useState(null)
+  const isFirstInput = useRef(true)
 
   useEffect(() => {
+    if (isFirstInput.current) {
+      isFirstInput.current = search === ''
+      return
+    }
     if (search === '') {
       setError('No se puede buscar una pelicula vacia')
       return
     }
-    if (search.match(/^\+$/)) {
+    if (search.match(/^\d+$/)) {
       setError('No se puede buscar una pelicular con un numero')
     }
     if (search.length < 3) {
@@ -52,17 +58,25 @@ function App () {
 
   return (
     <>
-      <header>
-        <h1>Buscador de Peliculas</h1>
-        <form className='form' onSubmit={handleSubmit}>
-          <input required onChange={handleChange} value={search} name='query' type='text' placeholder='Avengers, Star Wars, Matrix...' />
-          <button type='submit'>Buscar</button>
-        </form>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </header>
-      <main>
-        <Movies movies={movies} />
-      </main>
+      <div className='page'>
+        <header>
+          <h1>Buscador de Peliculas</h1>
+          <form className='form' onSubmit={handleSubmit}>
+            <input
+              style={{
+                border: '1px solid transparent',
+                borderColor: error ? 'red' : 'transparent'
+              }}
+              required onChange={handleChange} value={search} name='query' type='text' placeholder='Avengers, Star Wars, Matrix...'
+            />
+            <button type='submit'>Buscar</button>
+          </form>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+        </header>
+        <main>
+          <Movies movies={movies} />
+        </main>
+      </div>
     </>
   )
 }
