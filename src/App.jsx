@@ -30,14 +30,13 @@ function useSearch () {
   return { search, updateSearch, error }
 }
 function App () {
-  console.log('render')
-  const { movies } = useMovies()
   const { search, updateSearch, error } = useSearch()
+  const { movies, getMovies } = useMovies({ search })
 
   const handleSubmit = (event) => {
     // the method prevents the form from submitting and clears the input field
     event.preventDefault()
-    console.log({ search })
+    getMovies()
     /** Using "useRef" to get the input element
      *  const inputEl = inputRef.current
      *  const value = inputEl.value
