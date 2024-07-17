@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useMovies } from './hooks/useMovies'
 
 import { Movies } from './components/Movies'
+import Loading from './components/Loading'
 function useSearch () {
   const [search, updateSearch] = useState('')
   const [error, setError] = useState(null)
@@ -31,7 +32,7 @@ function useSearch () {
 }
 function App () {
   const { search, updateSearch, error } = useSearch()
-  const { movies, getMovies } = useMovies({ search })
+  const { movies, loading, getMovies } = useMovies({ search })
 
   const handleSubmit = (event) => {
     // the method prevents the form from submitting and clears the input field
@@ -51,8 +52,8 @@ function App () {
     */
   }
   const handleChange = (event) => {
-    /* if (newQuery.startsWith(' ')) return */
-    updateSearch(event.target.value)
+    const newSearch = event.target.value
+    updateSearch(newSearch)
   }
 
   return (
@@ -73,7 +74,9 @@ function App () {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </header>
         <main>
-          <Movies movies={movies} />
+          {
+            loading ? <Loading /> : <Movies movies={movies} />
+          }
         </main>
       </div>
     </>
