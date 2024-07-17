@@ -1,28 +1,27 @@
-import withResults from '../../mocks/with-results.json'
-import withoutResults from '../../mocks/no-results.json'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { searchMovies } from '../../services/movies'
 
-const API_KEY = import.meta.env.VITE_API_KEY
 export function useMovies ({ search }) {
-  const [responseMovies, setResponseMovies] = useState([])
-  const movies = responseMovies.Search
-  const mappedMovies = movies?.map(movie => ({
-    id: movie.imdbID,
-    title: movie.Title,
-    year: movie.Year,
-    poster: movie.Poster
-  }))
+  const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  const getMovies = () => {
-    if (search) {
-      fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${search}`)
-        .then(res => res.json())
-        .then(json => {
-          setResponseMovies(json)
-        })
-    } else {
-      setResponseMovies(withoutResults)
+  const [, setError] = useState(null)
+  const previousSearch = useRef(search)
+
+  const getMovies = async () => {
+    if (search === previousSearch.current) return
+    try {
+      setLoading(true)
+      setError(null)
+      previousSearch.current = search
+      const newMovies = await searchMovies({ search })
+      setMovies(newMovies)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
     }
   }
-  return { movies: mappedMovies, getMovies }
+  return { movies, getMovies, loading }
 }
+/* MAKE COMMIT AND REBASE THE LAST COMMIT === 1:10:29 /  */
