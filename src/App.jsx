@@ -1,10 +1,12 @@
 import './App.css'
-
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useMovies } from './hooks/useMovies'
 
 import { Movies } from './components/Movies'
 import Loading from './components/Loading'
+
+import debounce from 'just-debounce-it'
+
 function useSearch () {
   const [search, updateSearch] = useState('')
   const [error, setError] = useState(null)
@@ -32,8 +34,17 @@ function useSearch () {
 }
 function App () {
   const [sort, setSort] = useState(false)
+
   const { search, updateSearch, error } = useSearch()
   const { movies, loading, getMovies } = useMovies({ search, sort })
+
+  const debouncedGetMovies = useCallback(
+    debounce(search => {
+      console.log('search: ', search)
+      getMovies({ search })
+    }, 300)
+    , [getMovies]
+  )
 
   const handleSubmit = (event) => {
     // the method prevents the form from submitting and clears the input field
@@ -52,16 +63,17 @@ function App () {
      * console.log(query)
     */
   }
+
   const handleSort = () => {
     setSort(!sort)
   }
+
   const handleChange = (event) => {
     const newSearch = event.target.value
     updateSearch(newSearch)
+    debouncedGetMovies(newSearch)
   }
-  useEffect(() => {
-    console.log('Movies rendering')
-  }, [getMovies])
+
   return (
     <>
       <div className='page'>
