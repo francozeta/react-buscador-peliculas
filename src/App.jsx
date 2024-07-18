@@ -31,13 +31,14 @@ function useSearch () {
   return { search, updateSearch, error }
 }
 function App () {
+  const [sort, setSort] = useState(false)
   const { search, updateSearch, error } = useSearch()
-  const { movies, loading, getMovies } = useMovies({ search })
+  const { movies, loading, getMovies } = useMovies({ search, sort })
 
   const handleSubmit = (event) => {
     // the method prevents the form from submitting and clears the input field
     event.preventDefault()
-    getMovies()
+    getMovies({ search })
     /** Using "useRef" to get the input element
      *  const inputEl = inputRef.current
      *  const value = inputEl.value
@@ -51,11 +52,16 @@ function App () {
      * console.log(query)
     */
   }
+  const handleSort = () => {
+    setSort(!sort)
+  }
   const handleChange = (event) => {
     const newSearch = event.target.value
     updateSearch(newSearch)
   }
-
+  useEffect(() => {
+    console.log('Movies rendering')
+  }, [getMovies])
   return (
     <>
       <div className='page'>
@@ -69,6 +75,7 @@ function App () {
               }}
               required onChange={handleChange} value={search} name='query' type='text' placeholder='Avengers, Star Wars, Matrix...'
             />
+            <input type='checkbox' onChange={handleSort} checked={sort} />
             <button type='submit'>Buscar</button>
           </form>
           {error && <p style={{ color: 'red' }}>{error}</p>}
